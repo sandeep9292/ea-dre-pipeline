@@ -4,7 +4,7 @@ const PORT = process.env.PORT || 3000;
 
 app.get('/', (req, res) => {
   res.json({ 
-    message: 'EA DRE Pipeline — deployed via Jenkins',
+    message: 'EA DRE Pipeline — auto triggered — deployed via Jenkins',
     version: '1.0.0',
     status: 'healthy'
   });
