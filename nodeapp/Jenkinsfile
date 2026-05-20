@@ -1,0 +1,49 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                echo 'Stage 1 — Pulling code from GitHub'
+                git branch: 'main',
+                    url: 'https://github.com/YOURUSERNAME/ea-dre-pipeline.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                echo 'Stage 2 — Building Docker image'
+                sh 'docker build -t ea-dre-nodeapp .'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Stage 3 — Testing inside container'
+                sh 'docker run --rm ea-dre-nodeapp node --version'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Stage 4 — Running the app'
+                sh 'docker stop ea-dre-nodeapp-container || true'
+                sh 'docker rm ea-dre-nodeapp-container || true'
+                sh '''docker run -d \
+                  --name ea-dre-nodeapp-contai                -p 3000:3000 \
+                  ea-dre-nodeapp'''
+                echo 'App deployed at http://localhost:3000'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline succeeded — app is live!'
+        }
+        failure {
+            echo 'Pipeline failed — check logs'
+        }
+    }
+}
